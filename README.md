@@ -1,0 +1,2 @@
+# ExcelMergeTool
+基于Excel和VBA输出Json的配置系统，基于Python,Openpy和SVN的Excel冲突解决系统
