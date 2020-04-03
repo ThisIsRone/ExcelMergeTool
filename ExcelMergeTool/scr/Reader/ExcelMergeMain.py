@@ -74,17 +74,33 @@ class ExcelMergeMain:
         interse_set = mine_name_set.intersection(their_name_set)
         #不支持表头有变更
         for name in interse_set:
-            sheet_reader1 = self.mine_reader.sheet_reader_dic[name]
-            sheet_reader2 = self.base_reader.sheet_reader_dic[name]
-            if self.comparer.IsHasTitleDiff(sheet_reader1,sheet_reader2):
-                DebugHelper.LogColor(DebugHelper.FontColor.red,"【表头变更】终止合并 Mine和Base {}比较 存在表头差异(批注，合并单元格状态，占用行列，数据) ".format(name))
-                return False
-            sheet_reader1 = self.their_reader.sheet_reader_dic[name]
-            sheet_reader2 = self.base_reader.sheet_reader_dic[name]
-            if self.comparer.IsHasTitleDiff(sheet_reader1,sheet_reader2):
-                DebugHelper.LogColor(DebugHelper.FontColor.red,"【表头变更】终止合并 Their和Base {}比较 存在表头差异（(批注，合并单元格状态，占用行列，数据）".format(name))
-                return False
 
+            if name in self.mine_reader.sheet_reader_dic.keys() and name in self.base_reader.sheet_reader_dic.keys():
+                sheet_reader1 = self.mine_reader.sheet_reader_dic[name]
+                sheet_reader2 = self.base_reader.sheet_reader_dic[name]
+                if self.comparer.IsHasTitleDiff(sheet_reader1,sheet_reader2):
+                    DebugHelper.LogColor(DebugHelper.FontColor.red,"【表头变更】终止合并 Mine和Base {}比较 存在表头差异(批注，合并单元格状态，占用行列，数据) ".format(name))
+                    sheet_reader1.PrintTitle()
+                    sheet_reader2.PrintTitle()
+                    return False
+
+            if name in self.their_reader.sheet_reader_dic.keys() and name in self.base_reader.sheet_reader_dic.keys():
+                sheet_reader1 = self.their_reader.sheet_reader_dic[name]
+                sheet_reader2 = self.base_reader.sheet_reader_dic[name]
+                if self.comparer.IsHasTitleDiff(sheet_reader1,sheet_reader2):
+                    DebugHelper.LogColor(DebugHelper.FontColor.red,"【表头变更】终止合并 Their和Base {}比较 存在表头差异（(批注，合并单元格状态，占用行列，数据）".format(name))
+                    sheet_reader1.PrintTitle()
+                    sheet_reader2.PrintTitle()
+                    return False
+
+            if name in self.their_reader.sheet_reader_dic.keys() and name in self.mine_reader.sheet_reader_dic.keys():
+                sheet_reader1 = self.their_reader.sheet_reader_dic[name]
+                sheet_reader2 = self.mine_reader.sheet_reader_dic[name]
+                if self.comparer.IsHasTitleDiff(sheet_reader1,sheet_reader2):
+                    DebugHelper.LogColor(DebugHelper.FontColor.red,"【表头变更】终止合并 Their和Mine {}比较 存在表头差异（(批注，合并单元格状态，占用行列，数据）".format(name))
+                    sheet_reader1.PrintTitle()
+                    sheet_reader2.PrintTitle()
+                    return False
         #合并操作需要只处理两个目标版本的差异数据，暂不判断同一修改区域的逻辑
         #不支持 修改mine和thier修改了同一张sheet的同一key的bounds下的数据
         interse_set = self._getSameSheetNames(self.mine_reader,self.their_reader)
@@ -151,11 +167,11 @@ class ExcelMergeMain:
                 for sheet_name in del_list:
                     merge_reader.has_diff = True
                     if sheet_name in merge_reader.sheet_names:
-                        DebugHelper.Log("【删除sheet】Sheet: {}".format(sheet_name))
-                        merge_reader.workBook.remove(sheet_name) 
-                        DebugHelper.Log("【删除sheet】Sheet: {} Done".format(sheet_name))
-                    else:
-                        DebugHelper.LogColor(DebugHelper.FontColor.red,"【删除sheet失败】Their和Mine都删除了{} Sheet ".format(sheet_name))
+                        DebugHelper.LogColor(DebugHelper.FontColor.yellow,"【不支持删除sheet】Sheet: {}".format(sheet_name))
+                    #     merge_reader.workBook.remove(sheet_name) 
+                    #     DebugHelper.Log("【删除sheet】Sheet: {} Done".format(sheet_name))
+                    # else:
+                    #     DebugHelper.LogColor(DebugHelper.FontColor.red,"【删除sheet失败】Their和Mine都删除了{} Sheet ".format(sheet_name))
 
 
     #合并完成

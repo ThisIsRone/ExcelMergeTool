@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Dec 13 15:12:40 2019
-
+openpyxl中 bounds元组定义的顺序是：0-3 min_col, min_row, max_col, max_row
 @author: admin
 """
 
@@ -17,13 +17,14 @@ class ExcelReader:
              raise Exception("Invalid ExcelReader path_xlsm!", path_xlsm)
         DebugHelper.Log("【读取资源】 " + path_xlsm + " " + excel_title)
         self.workBook = load_workbook(filename = path_xlsm, read_only=False, keep_vba=True)
-        self.dataonly_workBook = load_workbook(filename = path_xlsm, read_only=False, keep_vba=True,data_only=True)
+        # self.dataonly_workBook = load_workbook(filename = path_xlsm, read_only=False, keep_vba=True,data_only=True)
+        DebugHelper.Log("【加载完成】 " + path_xlsm)
         sheet_names = self.workBook.get_sheet_names()
         sheet_reader_dic = dict()
         for name in sheet_names:
             sheet = self.workBook.get_sheet_by_name(name)
-            dataonly_sheet = self.dataonly_workBook.get_sheet_by_name(name)
-            reader = SheetReader(sheet,dataonly_sheet,excel_title)
+            # dataonly_sheet = self.dataonly_workBook.get_sheet_by_name(name)
+            reader = SheetReader(sheet,None,excel_title)
             sheet_reader_dic[name] =  reader
         self.sheet_reader_dic = sheet_reader_dic
         self.sheet_names = set(sheet_names)
@@ -46,7 +47,7 @@ class ExcelReader:
         DebugHelper.Log("【完成合并】")
 
     def OnRelease(self):
-        self.dataonly_workBook.close()
+        # self.dataonly_workBook.close()
         if self.has_diff:            
             self.workBook.save(self.path_xlsm)
         self.workBook.close()

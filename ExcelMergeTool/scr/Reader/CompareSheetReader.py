@@ -16,11 +16,13 @@ Created on Sat Dec 14 17:47:11 2019
 
 import scr.Helper.DebugHelper as DebugHelper
 
-#判断是否有中文
+#判断是否有是备注Sheet
 def IsHasChinese(check_str):
-    for ch in check_str:
-        if u'\u4e00' <= ch <= u'\u9fff':
-            return True
+    if check_str.startswith("__"):
+        return True 
+    # for ch in check_str:
+    #     if u'\u4e00' <= ch <= u'\u9fff':
+    #         return True
     return False
 
 class CompareSheetReader:

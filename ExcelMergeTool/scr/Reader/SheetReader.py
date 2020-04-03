@@ -98,18 +98,22 @@ class SheetReader:
     #获取当前表的有效宽度
     def _getConfigWidth(self):
         sheet = self.sheet
-        max_value_column = 1
-        #取第一行最后一个有有效值
-        for row_items in sheet.iter_cols(max_row = 1):
+        max_value_column = 0
+        #遍历表头的列 若该列的每一个单元格没有数据 则认为是表头结束的标志
+        for row_items in sheet.iter_cols(max_row = self.max_title_row):
+            sign = False
             for cell in row_items:
                 if cell.value != None:
-                    if max_value_column < cell.column:
-                        max_value_column = cell.column        
-        #匹配最后一个有效值的合并单元格 并获取单元格的最大列
+                    sign = True
+                    break
+            if sign:
+                max_value_column += 1
+            else:
+                break      
+        #根据max_value_column尝试合并单元格（一个合并单元格只有一个单元格有数据）
         for merge_cell in sheet.merged_cells.ranges:             
-            if merge_cell.bounds[0] == max_value_column and merge_cell.bounds[1] == 1:
-                if max_value_column < merge_cell.bounds[2]:
-                    max_value_column = merge_cell.bounds[2]                    
+            if merge_cell.bounds[0] == max_value_column and max_value_column < merge_cell.bounds[2]:
+                max_value_column = merge_cell.bounds[2]       
         return max_value_column
 
     #取目标区域的单元格数据和合并单元格
@@ -349,3 +353,11 @@ class SheetReader:
                 return True
         return False
 
+    def PrintTitle(self):
+        sheet = self.sheet
+        #遍历表头的列 若该列的每一个单元格没有数据 则认为是表头结束的标志
+        for row_items in sheet.iter_rows(max_row = self.max_title_row,max_col = self.compare_width):
+            print(self.excel_title,end=":\t") 
+            for cell in row_items:
+                print(cell.value,end="\t") 
+            print("") 
